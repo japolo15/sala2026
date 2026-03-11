@@ -70,11 +70,20 @@ def run_optimized_pipeline():
 
             # Only process and write every 4th frame
             if frame_idx % frame_interval == 0:
-                # Apply Telea Inpainting (Radius 3 as requested)
+                # 1. Apply Telea Inpainting (Radius 3 as requested)
                 inpainted = cv2.inpaint(frame, mask, inpaintRadius=3, flags=cv2.INPAINT_TELEA)
                 
+                # 2. Apply CLAHE Enhancement (Adapted for BGR pipeline)
+                lab = cv2.cvtColor(inpainted, cv2.COLOR_BGR2LAB)
+                l, a, b = cv2.split(lab)
+                clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+                cl = clahe.apply(l)
+                enhanced_lab = cv2.merge((cl, a, b))
+                # Convert back to BGR for the FFmpeg pipe
+                processed_frame = cv2.cvtColor(enhanced_lab, cv2.COLOR_LAB2BGR)
+
                 # Write raw BGR bytes to the ffmpeg pipe
-                process.stdin.write(inpainted.tobytes())
+                process.stdin.write(processed_frame.tobytes())
                 processed_count += 1
 
                 if processed_count % 100 == 0:
