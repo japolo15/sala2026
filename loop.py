@@ -4,7 +4,8 @@ os.environ['OPENCV_FFMPEG_READ_ATTEMPTS'] = '10000'
 import cv2 as cv
 
 # Configuration
-video_path = 'C:\\Users\\japol\\Documents\\codingStuff\\hackathon\\sala2026\\hackathon_data\\bruv-videos\\LGH020002.MP4'  # Replace with your video file path
+# Use a generic path that works across platforms (Windows/Linux)
+video_path = os.path.join('hackathon_data', 'bruv-videos', 'LGH020002.MP4')
 output_folder = 'extracted_frames'
 frame_interval = 4  # Extract every 4th frame
 

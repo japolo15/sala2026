@@ -29,7 +29,7 @@ wheels/
 participant-download.env
 
 # Data directories
-hackathon_data/
+hackathon_data/bruv-videos/*
 extracted_frames/
 
 # IDE
