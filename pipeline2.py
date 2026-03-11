@@ -24,20 +24,23 @@ def run_optimized_pipeline():
         print("Error: Could not open video.")
         return
 
+    # Set target dimensions to 720p for output
+    target_w, target_h = 1280, 720
+
     mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
-    width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    if mask is None:
+        print(f"Error: Could not read mask at {mask_path}")
+        return
+
     orig_fps = cap.get(cv2.CAP_PROP_FPS)
     total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     
     # Calculate new FPS to maintain original duration
     new_fps = orig_fps / frame_interval
-    
-    # FFmpeg prefers fractional frame rates (like 60000/1001) or simple floats
     fps_arg = f"{new_fps:.3f}"
 
-    print(f"Processing: {input_video} ({width}x{height} @ {orig_fps:.2f} FPS)")
-    print(f"Output: {output_video} (@ {fps_arg} FPS)")
+    print(f"Input: {input_video} (@ {orig_fps:.2f} FPS)")
+    print(f"Processing at original resolution, then downscaling to {target_w}x{target_h} @ {fps_arg} FPS")
     print(f"Syncing timeline by processing every {frame_interval}th frame...")
 
     # 4. Setup FFmpeg Pipe
@@ -46,11 +49,11 @@ def run_optimized_pipeline():
         '-f', 'rawvideo',
         '-vcodec', 'rawvideo',
         '-pixel_format', 'bgr24',
-        '-video_size', f"{width}x{height}",
+        '-video_size', f"{target_w}x{target_h}",
         '-framerate', fps_arg,
         '-i', '-',
-        '-c:v', 'mpeg4',          # Switched to native mpeg4 encoder
-        '-q:v', '1',               # Constant quality (1 is highest for mpeg4)
+        '-c:v', 'mpeg4',
+        '-q:v', '1',
         '-pix_fmt', 'yuv420p',
         output_video
     ]
@@ -70,17 +73,20 @@ def run_optimized_pipeline():
 
             # Only process and write every 4th frame
             if frame_idx % frame_interval == 0:
-                # 1. Apply Telea Inpainting (Radius 3 as requested)
+                # 1. Apply Telea Inpainting at ORIGINAL resolution
                 inpainted = cv2.inpaint(frame, mask, inpaintRadius=3, flags=cv2.INPAINT_TELEA)
                 
-                # 2. Apply CLAHE Enhancement (Adapted for BGR pipeline)
+                # 2. Apply CLAHE Enhancement at ORIGINAL resolution
                 lab = cv2.cvtColor(inpainted, cv2.COLOR_BGR2LAB)
                 l, a, b = cv2.split(lab)
                 clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
                 cl = clahe.apply(l)
                 enhanced_lab = cv2.merge((cl, a, b))
-                # Convert back to BGR for the FFmpeg pipe
-                processed_frame = cv2.cvtColor(enhanced_lab, cv2.COLOR_LAB2BGR)
+                # Convert back to BGR
+                enhanced_bgr = cv2.cvtColor(enhanced_lab, cv2.COLOR_LAB2BGR)
+
+                # 3. Downscale to 720p AFTER processing
+                processed_frame = cv2.resize(enhanced_bgr, (target_w, target_h), interpolation=cv2.INTER_AREA)
 
                 # Write raw BGR bytes to the ffmpeg pipe
                 process.stdin.write(processed_frame.tobytes())
