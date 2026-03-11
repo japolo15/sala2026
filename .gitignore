@@ -31,6 +31,7 @@ participant-download.env
 # Data directories
 hackathon_data/bruv-videos/*
 extracted_frames/
+sam_ready_video.mp4
 
 # IDE
 .vscode/
