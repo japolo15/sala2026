@@ -3,7 +3,8 @@ import os
 from pathlib import Path
 
 # Configuration
-video_path = 'C:\\Users\\japol\\Documents\\codingStuff\\hackathon\\sala2026\\hackathon_data\\bruv-videos\\LGH020002.MP4'
+# Use a generic path that works across platforms (Windows/Linux)
+video_path = os.path.join('hackathon_data', 'bruv-videos', 'LGH020002.MP4')
 output_folder = 'extracted_frames'
 frame_interval = 4  # Extract every 4th frame
 
