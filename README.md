@@ -1,9 +1,9 @@
-# BRUV Video Preprocessing & Segmentation Pipeline
+# FiCoBRI: Fish Counter in BRUV Images
 
-An end-to-end automated system for cleaning, enhancing, and segmenting underwater footage using traditional Computer Vision and Meta's **Segment Anything Model 3 (SAM 3)**.
+FiCoBRI is an end-to-end pipeline for BRUV footage that cleans, enhances, and segments underwater video using traditional Computer Vision and Meta's **Segment Anything Model 3 (SAM 3)**.
 
 ## 🚀 Achievements & Capabilities
-This project delivers a high-performance pipeline specifically tuned for the challenges of marine environments:
+FiCoBRI delivers a high-performance workflow specifically tuned for the challenges of marine environments:
 
 *   **Static Object Removal**: Automated inpainting (Telea algorithm) scrubs bait arms and hardware from footage.
 *   **Underwater Enhancement**: Integrated **CLAHE** (Contrast Limited Adaptive Histogram Equalization) filters out murky "blue haze," significantly improving object detection rates.
@@ -26,6 +26,15 @@ This project delivers a high-performance pipeline specifically tuned for the cha
 *   `manifest.json`: Metadata registry for all hackathon datasets and checksums.
 
 ## 💻 Quick Start
+
+### 0. Configure R2 Credentials
+Create a local credentials file before downloading datasets:
+
+```bash
+cp participant-download.env.example participant-download.env
+```
+
+Then edit `participant-download.env` with your real R2 credentials.
 
 ### 1. Prepare Data
 ```bash

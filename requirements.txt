@@ -1,0 +1,16 @@
+boto3
+tqdm
+opencv-python
+numpy>=2
+matplotlib
+scikit-learn
+scipy
+scikit-image<0.25
+decord
+einops
+pillow
+psutil
+huggingface_hub
+torch
+torchvision
+git+https://github.com/facebookresearch/sam3.git

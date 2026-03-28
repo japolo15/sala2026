@@ -28,6 +28,10 @@ wheels/
 *.env
 participant-download.env
 
+# Keep dependency manifests tracked
+!requirements.txt
+!inpaint/requirements.txt
+
 # Data directories
 hackathon_data/bruv-videos/*
 extracted_frames/
